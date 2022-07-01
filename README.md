@@ -1,4 +1,4 @@
-# GoCardless sample application
+# Data collector for WayCarbon
 
 ## Setup
 
