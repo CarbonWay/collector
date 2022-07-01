@@ -1,12 +1,15 @@
+from lib2to3.pgen2 import token
 from pydoc import describe
 from django.db import models
 from django.utils import timezone
 import datetime
+import secrets
 
 class Device(models.Model):
     name = models.CharField(max_length=500)
     description = models.CharField(max_length=2000)
     location = models.CharField(max_length=2000, default='-1')
+    token = models.CharField(max_length=512, default=secrets.token_urlsafe())
 
     def __str__(self):
         return f"Device: {self.name}, location: {self.location}, description: {self.description}"
