@@ -12,7 +12,7 @@ class Device(models.Model):
     token = models.CharField(max_length=512, default=secrets.token_urlsafe())
 
     def __str__(self):
-        return f"Device: {self.name}, location: {self.location}, description: {self.description}"
+        return f"Device: {self.name}, location: {self.location}, description: {self.description}, pk: {self.pk}"
 
 
 def user_directory_path(instance, filename):

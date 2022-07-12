@@ -15,9 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-
-
 from django.contrib import admin
+
+
+admin.site.site_header = "WayCarbon admin's panel"
+admin.site.site_title = "WayCarbon"
+admin.site.index_title = "Администрирование сервера"
 
 urlpatterns = [
     path('loader/', include('loader.urls')),
