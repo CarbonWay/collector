@@ -6,6 +6,7 @@ from django.http import HttpResponse, Http404
 import os
 from django.conf import settings
 from loader.models import *
+import pandas as pd
 
 import os
 import zipfile
@@ -29,16 +30,14 @@ class DataFileAdmin(admin.ModelAdmin):
     list_filter = ("date",)
     search_fields = ("date", 'file')
 
-    actions = ['download_file']
+    actions = ['download_file', 'download_csv_file']
 
     def download_file(self, request, queryset):
-
         filenames = []
 
         for query in queryset:
             file_path = os.path.join(settings.MEDIA_ROOT, str(query.file))
             filenames.append(file_path)
-
         zip_subdir = "export"
         zip_filename = "%s.zip" % zip_subdir
         s = BytesIO()
@@ -55,7 +54,29 @@ class DataFileAdmin(admin.ModelAdmin):
         resp['Content-Disposition'] = 'attachment; filename=%s' % zip_filename
 
         return resp
-    download_file.short_description = "Download CSV file for selected files"
+    download_file.short_description = "Download zip archive with selected files"
+
+
+    def download_csv_file(self, request, queryset):
+        print(queryset[0].device)
+        print(dir(queryset[0].device))
+
+        df = pd.DataFrame()
+
+        for query in queryset:
+            try:
+                file_path = os.path.join(settings.MEDIA_ROOT, str(query.file))
+                temp_df = pd.read_csv(file_path, sep="\s+")
+                df = pd.concat([df, temp_df], axis=0)
+            except Exception as e:
+                print(e)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=export.csv'  # alter as needed
+        df.to_csv(path_or_buf=response)  # with other applicable parameters
+        return response
+
+
 
     def view_device_link(self, obj):
         url = (

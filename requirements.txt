@@ -3,3 +3,5 @@ Django==3.2.13
 pytz==2022.1
 sqlparse==0.4.2
 typing_extensions==4.2.0
+pandas==1.4.3
+numpy==1.23.1
