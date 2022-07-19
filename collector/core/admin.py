@@ -30,7 +30,7 @@ class DataFileAdmin(admin.ModelAdmin):
     list_filter = ("date",)
     search_fields = ("date", 'file')
 
-    actions = ['download_file', 'download_csv_file']
+    actions = ['download_file', 'download_csv_file', 'download_ghg_csv_file']
 
     def download_file(self, request, queryset):
         filenames = []
@@ -67,6 +67,33 @@ class DataFileAdmin(admin.ModelAdmin):
             try:
                 file_path = os.path.join(settings.MEDIA_ROOT, str(query.file))
                 temp_df = pd.read_csv(file_path, sep="\s+")
+                df = pd.concat([df, temp_df], axis=0)
+            except Exception as e:
+                print(e)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=export.csv'  # alter as needed
+        df.to_csv(path_or_buf=response)  # with other applicable parameters
+        return response
+
+
+    def download_ghg_csv_file(self, request, queryset):
+        df = pd.DataFrame()
+        for query in queryset:
+            try:
+                file_path = os.path.join(settings.MEDIA_ROOT, str(query.file))
+
+                archive = zipfile.ZipFile(file_path, 'r')
+                data_filename = ''
+                for name in archive.filelist:
+                    if name.filename.endswith('.data'):
+                        data_filename = name.filename
+                        break
+                file = archive.read(data_filename)
+                file_list = str(file).split(r'\n')
+                timezone = file_list[6].replace('Timezone:\\t', '')
+
+                temp_df = pd.read_csv(BytesIO(file), skiprows=7, delimiter='\t')
                 df = pd.concat([df, temp_df], axis=0)
             except Exception as e:
                 print(e)
