@@ -25,4 +25,5 @@ admin.site.index_title = "Администрирование сервера"
 urlpatterns = [
     path('loader/', include('loader.urls')),
     path('admin/', admin.site.urls),
+    path('api/v1/', include('observer.urls')),
 ]
