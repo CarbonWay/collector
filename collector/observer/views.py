@@ -3,6 +3,7 @@ from loader.models import DataFile, Device
 from django.http import JsonResponse
 import json
 import pandas as pd
+import numpy as np
 from django.conf import settings
 import os
 import zipfile
@@ -46,6 +47,10 @@ def get_mean_data(request):
 def get_mean_df(df, delta_time = 'H'): # M - minutes
 
     df['datetime'] = df['date'] + ' ' + df['time']
+    if 'date' in df.columns and 'time' in df.columns:
+        df['datetime'] = df['date'] + ' ' + df['time']
+    else:
+        return pd.DataFrame()
 
     try:
         df["datetime"] = pd.to_datetime(df["datetime"], format="%Y-%m-%d %H:%M:%S:%f")
@@ -61,6 +66,10 @@ def get_mean_df(df, delta_time = 'H'): # M - minutes
     # df_p['Hour'] = df['newDateTime'].dt.hour.astype(str)
     # df_p['Minute'] = df['newDateTime'].dt.minute.astype(str)
     # df_p['Second'] = df['newDateTime'].dt.second.astype(str)
+    df_p = df_p.fillna(np.nan).replace([np.nan], [None])
+
+    print('______________number of nulls in mean df', df_p.isnull().sum().sum())
+    print(df_p)
 
     return df_p.iloc[:, :]
 
@@ -69,6 +78,9 @@ def get_mean_df(df, delta_time = 'H'): # M - minutes
 
 def parse_device_data(datafiles):
     output = pd.DataFrame()
+
+    if len(datafiles) == 0:
+        return output
 
     if '.' in str(datafiles[0]['file']):
         extension = str(datafiles[0]['file']).split('.')[-1]
@@ -82,6 +94,8 @@ def parse_device_data(datafiles):
         output = parse_ghg_files(datafiles)
 
     output.columns= output.columns.str.lower()
+
+    print('______________number of nulls', output.isnull().sum().sum())
 
     return output
 
