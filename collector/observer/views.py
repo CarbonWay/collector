@@ -65,8 +65,12 @@ def get_mean_df(df, delta_time = 'H'): # M - minutes
 
 
 def parse_device_data(datafiles):
-    extension = str(datafiles[0]['file']).split('.')[-1]
     output = pd.DataFrame()
+
+    if '.' in str(datafiles[0]['file']):
+        extension = str(datafiles[0]['file']).split('.')[-1]
+    else:
+        return output
 
     if extension == 'dat':
         output = parse_dat_files(datafiles)
