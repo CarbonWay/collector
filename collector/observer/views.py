@@ -46,7 +46,7 @@ def get_mean_data(request):
 
 def get_mean_df(df, delta_time = 'H'): # M - minutes
 
-    df['datetime'] = df['date'] + ' ' + df['time']
+    # df['datetime'] = df['date'] + ' ' + df['time']
     if 'date' in df.columns and 'time' in df.columns:
         df['datetime'] = df['date'] + ' ' + df['time']
     else:
