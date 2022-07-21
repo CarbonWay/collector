@@ -18,9 +18,9 @@ def get_full_data(request):
 
     for device in devices:
         device_datafiles = device.datafile_set.values()
-        output = parse_device_data(device_datafiles)
-        export[str(device.name)] = json.loads(json.dumps(list(output.T.to_dict().values())))
-
+        if len(device_datafiles) > 0:
+            output = parse_device_data(device_datafiles)
+            export[str(device.name)] = json.loads(json.dumps(list(output.T.to_dict().values())))
     return JsonResponse(export)
 
 
